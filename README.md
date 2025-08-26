@@ -2,6 +2,26 @@
 
 # LAB | Express Mongoose Recipes
 
+<details>
+  <summary>
+    <h2>Learning Goals</h2>
+  </summary>
+
+  This exercise allows you to practice and apply the concepts and techniques taught in class. 
+
+  Upon completion of this exercise, you will be able to:
+
+
+  - Use Mongoose in a Node.js project to connect to a MongoDB database and perform CRUD operations
+- Create Mongoose Schemas and Models for your MongoDB collections
+- Implement server routes in Express.js to handle `GET`, `POST`, `PUT`, and `DELETE` HTTP requests
+- Create dynamic routes in Express.js using route parameters
+
+  <br>
+
+  <hr>
+</details>
+
 ## Introduction
 
 ![thai_style_chicken_noodle_soup_pieces_recipe_web](https://user-images.githubusercontent.com/23629340/38369283-ac1bda62-38e7-11e8-9c9b-d9df623f1bc3.jpg)
@@ -41,7 +61,7 @@ To help you get started quickly, the project comes with the basic setup and all 
 
 
 
-To run our application, the first thing you have to do is install all of its dependencies. Run the following command:
+To run the application, the first thing you have to do is install all of its dependencies. Run the following command:
 
 ```shell
 npm install
@@ -57,7 +77,7 @@ npm install mongoose
 
 
 
-To run the app:
+And finally, run the app using the following command:
 
 ```shell
 npm run dev
@@ -86,7 +106,7 @@ const mongoose = require("mongoose");
 // app.js
 //...
 
-const MONGODB_URI = "mongodb://127.0.0.1:27017/mongoose-recipes-dev";
+const MONGODB_URI = "mongodb://127.0.0.1:27017/express-mongoose-recipes-dev";
 
 mongoose
   .connect(MONGODB_URI)
@@ -106,14 +126,13 @@ mongoose
 
 Create a `Recipe` model inside of the file `/models/Recipe.model.js`. The schema should have the following fields:
 
-- **title** - Type `String`. It should be *required*.
+- **title** - Type `String`. It should be *required* and *unique*.
+- **instructions** - Type `String`. It should be *required*.
 - **level** - Type `String`. It can be one of the following values: _Easy Peasy_ - _Amateur Chef_ - _UltraPro Chef_ (use the [`enum`](https://mongoosejs.com/docs/api/schemanumberoptions.html#SchemaNumberOptions.prototype.enum) validator :wink:).
-- **ingredients** - Type `Array` of `String`s (represented as `[ String ]`).
-- **cuisine** - Type `String`. It should be *required*.
-- **dishType** - Type `String`. Possible values: _breakfast_, _main_course_, _soup_, _snack_, _drink_, _dessert_, or _other_.
+- **ingredients** - Type `Array` of `String`s - represented as `[ String ]`.
 - **image** - Type `String`. Default value: _"https://images.media-allrecipes.com/images/75131.jpg"_.
 - **duration** - Type `Number`. The minimum value should be 0.
-- **creator** - Type `ObjectId` referencing the `User` model, enabling the use of `.populate()` to retrieve the associated document (represented as `mongoose.ObjectId`).
+- **isArchived** - Type `Boolean`. The default value should be `false`.
 - **created** - Type `Date`. By default, today.
 
 <br>
@@ -124,31 +143,50 @@ Create a `Recipe` model inside of the file `/models/Recipe.model.js`. The schema
 
 
 
-<hr>
+<details>
 
-### Iteration 3 | User Model
+  <summary><b>Solution</b></summary>
 
-Create a `User` model inside of the file `/models/User.model.js`. The schema should have the following fields:
+  ```js
+  // models/Recipe.model.js
 
-- **email** - Type String.  It should be *required* and *unique*.
-- **firstName** - Type `String`. It should be *required* and have a minimum length of 2.
-- **lastName** - Type `String`. It should be *required* and have a minimum length of 2.
-- **password** - Type `String`.  It should be *required* and have minimum length of 8.
-- **image** - Type `String`.  Default value: _"https://xsgames.co/randomusers/assets/avatars/pixel/44.jpg"_.
+  const mongoose = require("mongoose");
+  const Schema = mongoose.Schema;
+
+  // CREATE A SCHEMA
+  const recipeSchema = new Schema({
+    title: { type: String, required: true, unique: true },
+    instructions: { type: String, required: true },
+    level: { type: String, enum: ["Easy Peasy", "Amateur Chef", "UltraPro Chef"] },
+    ingredients: { type: [String] },
+    image: { type: String, default: "https://images.media-allrecipes.com/images/75131.jpg" },
+    duration: { type: Number, min: 0 },
+    isArchived: { type: Boolean, default: false },
+    created: { type: Date, default: Date.now }
+  });
+
+  // CREATE A MODEL
+  const Recipe = mongoose.model("Recipe", recipeSchema);
+
+  // EXPORT THE MODEL
+  module.exports = Recipe;
+  ```
+
+
+  <br>
+
+  <hr>
+</details>
 
 <br>
 
-**Note:** Remember to export the model from the file and require it in `app.js` to be able to use it.
-
-<br>
-
 
 
 <hr>
 
-### Iteration 4 | Create Recipe
+### Iteration 3 | Create a Recipe
 
-Now that you have established the database connection and created the models, it's time to create the routes. We will start with the routes for the recepies colleciton.
+Now that you have established the database connection and created the models, it's time to create the routes. We will start with the routes for the recepies collection.
 
 Create a new route `POST` `/recipes` that, upon request, *creates* a new recipe document in the database. See the instructions below on how to construct this route:
 
@@ -190,13 +228,34 @@ Create a new route `POST` `/recipes` that, upon request, *creates* a new recipe 
 
 
 
+<details>
+
+
+  <summary><b>Solution</b></summary>
+
+  <p align="center">
+    <img src="https://education-team-2020.s3.eu-west-1.amazonaws.com/web-dev/labs/lab-express-mongoose-recipes-v2/01-lab-mongoose-recipes-solution-post-recipes-req-body.png" alt="iteration solution code snippet" width="750">
+  </p>
+
+
+  <br>
+
+  <hr>
+
+
+</details>
+
+<br>
+
+
+
 <br>
 
 
 
 <hr>
 
-### Iteration 5 | Read All Recipes
+### Iteration 4 | Get All Recipes
 
 Create a new route `GET` `/recipes` that, upon request, *retrieves* all the recipe documents from the database. See instructions below for more details:
 
@@ -239,6 +298,27 @@ Create a new route `GET` `/recipes` that, upon request, *retrieves* all the reci
 
 
 
+<details>
+
+
+  <summary><b>Solution</b></summary>
+
+  <p align="center">
+    <img src="https://education-team-2020.s3.eu-west-1.amazonaws.com/web-dev/labs/lab-express-mongoose-recipes-v2/02-lab-mongoose-recipes-solution-get-all-recipes.png" alt="iteration solution code snippet" width="750">
+  </p>
+
+
+  <br>
+
+  <hr>
+
+
+</details>
+
+<br>
+
+
+
 <br>
 
 
@@ -247,7 +327,7 @@ Create a new route `GET` `/recipes` that, upon request, *retrieves* all the reci
 
 <hr>
 
-### Iteration 6 | Read a Single Recipe
+### Iteration 5 | Get a Single Recipe
 
 Create a new route `GET` `/recipes/:id` that, upon request, *retrieves* a specified recipe document by its `_id` from the database. You can find the instructions for the route below:
 
@@ -290,13 +370,34 @@ Create a new route `GET` `/recipes/:id` that, upon request, *retrieves* a specif
 
 
 
+<details>
+
+
+  <summary><b>Solution</b></summary>
+
+  <p align="center">
+    <img src="https://education-team-2020.s3.eu-west-1.amazonaws.com/web-dev/labs/lab-express-mongoose-recipes-v2/03-lab-mongoose-recipes-solution-get-single-recipe.png" alt="iteration solution code snippet" width="750">
+  </p>
+
+
+  <br>
+
+  <hr>
+
+
+</details>
+
+<br>
+
+
+
 <br>
 
 
 
 <hr>
 
-### Iteration 7 | Update a Single Recipe
+### Iteration 6 | Update a Single Recipe
 
 Create a new route `PUT` `/recipes/:id` that, upon request, *updates* a specified recipe document in the database. See the instructions below on how to construct this route:
 
@@ -308,8 +409,6 @@ Create a new route `PUT` `/recipes/:id` that, upon request, *updates* a specifie
   <summary><b>See Instructions</b></summary>
 
   <br>
-
-
 
 
 
@@ -342,13 +441,36 @@ Create a new route `PUT` `/recipes/:id` that, upon request, *updates* a specifie
 
 
 
+
+
+<details>
+
+
+  <summary><b>Solution</b></summary>
+
+  <p align="center">
+    <img src="https://education-team-2020.s3.eu-west-1.amazonaws.com/web-dev/labs/lab-express-mongoose-recipes-v2/04-lab-mongoose-recipes-solution-update-single-recipe.png" alt="iteration solution code snippet" width="750">
+  </p>
+
+
+  <br>
+
+  <hr>
+
+
+</details>
+
+<br>
+
+
+
 <br>
 
 
 
 <hr>
 
-### Iteration 8 | Delete a Single Recipe
+### Iteration 7 | Delete a Single Recipe
 
 Create a new route `DELETE` `/recipes/:id` that, upon request, *deletes* a specified recipe document by its `_id` from the database. See the instructions below on how to construct this route:
 
@@ -393,280 +515,24 @@ Create a new route `DELETE` `/recipes/:id` that, upon request, *deletes* a speci
 
 
 
-<br>
-
-
-
-<hr>
-
-### Iteration 9 | Create a Single User
-
-Create a new route `POST` `/users` that, upon request, *creates* a new user document in the database. See instructions below for more details:
-
-
-
 <details>
-  <summary><b>See Instructions</b></summary>
-
-  <br>
 
 
+  <summary><b>Solution</b></summary>
 
-**HTTP Request:**
-
-- Method: **`POST`**
-
-- Route: **`/users`**
-
-  
-
-**HTTP Response:**
-
-- Status code: **`201`** (Created) if the document is successfully created.
-- Content-Type: JSON
-
-
-
-**Error Response:**
-
-- Status code: **`500`** (Internal Server Error) in case of an error.
-
+  <p align="center">
+    <img src="https://education-team-2020.s3.eu-west-1.amazonaws.com/web-dev/labs/lab-express-mongoose-recipes-v2/05-lab-mongoose-recipes-solution-update-single-recipe.png" alt="iteration solution code snippet" width="750">
+  </p>
 
 
   <br>
 
-
+  <hr>
 
 
 </details>
 
-
-
 <br>
-
-
-
-<hr>
-
-
-### Bonus - Iteration 10 | Populate Users in Recipes
-
-For this iteration, you need to update the `GET` routes `/recipes` and `/recipes/:id` to populate the `user` field in each retrieved *recipe* document, replacing the stored `ObjectId` with the actual *user* document. 
-
-You will need to use the `.populate()` method to do this. :wink:
-
-<br>
-
-
-
-<hr>
-
-### Bonus - Iteration 11 | Retrieve a Single User
-
-Create a new route `GET` `/users/:id` that, upon request, *retrieves* a specified user document by its `_id` from the database.
-
-
-
-<details>
-  <summary><b>See Instructions</b></summary>
-
-  <br>
-
-
-
-**HTTP Request:**
-
-- Method: **`GET`**
-
-- Route: **`/users/:id`**
-
-  
-
-**HTTP Response:**
-
-- Status code: **`200`** (OK)
-
-- Content-Type: JSON
-
-  
-
-**Error Response:**
-
-- Status code: **`500`** (Internal Server Error) in case of an error.
-
-
-
-  <br>
-
-
-
-</details>
-
-
-
-<br>
-
-
-
-<hr>
-
-### Bonus - Iteration 12 | Add Favorites
-
-In this iteration, your task is to extend the functionality of the API  and provide a way to store favorite recipes for each user.
-
-
-
-<br>
-
-
-
-
-
-#### 12.1 | Update the `User` Model
-
-To do this, you need to modify the schema of the `User` model and add a new field `favorites` used for storing the favorite recipes:
-
--  **favorites** - Type `Array` of `ObjectId`s referencing the documents from the `Recipes` model <br> (represented as `[ mongoose.ObjectId ]`). Default value: `[]`
-
-  <br>
-  
-  
-
-Once you have made this change, you will need to create a couple of new routes to update and retrieve user documents. 
-
-
-
-<br>
-
-<hr>
-
-#### 12.2 | Updating a Single User
-
-Create a route `PUT` `/users/:id` that, upon request, *updates* the specified user document and adds the *recipe id* to the `favorites`:
-
-
-
-  <br>
-
-
-
-<details>
-  <summary><b>See Instructions</b></summary>
-
-  <br>
-
-
-
-**HTTP Request:**
-
-- Method: **`PUT`**
-- Route: **`/users/:id`**
-
-
-
-**HTTP Response:**
-
-- Status code: **`200`** (OK)
-- Content-Type: JSON
-
-
-
-**Error Response:**
-
-- Status code: **`500`** (Internal Server Error) in case of an error.
-
-
-
-  <br>
-
-
-
-</details>
-
-
-
-<br>
-
-
-
-**Hint:**
-
-To push the *recipe id* to the array of `favorites`, use the following syntax:
-
-```js
-User.findByIdUpdate(
-  <USER_ID>,
-  { $push: { favorites: <RECIPE_ID>  } },
-  { new: true }
-)
-```
-
-*The MongoDB [`$push`](https://www.mongodb.com/docs/v6.0/reference/operator/update/push/#mongodb-update-up.-push) operator appends a specified value to an array.*
-
-*The `<USER_ID>` and `<RECIPE_ID>` are just placeholders that you should replace with the document `_id`.*
-
-
-
-<br>
-
-
-
-<hr>
-
-#### 12.3 | Retrieve a Single User with Favorites
-
-Create a route `GET` `/users/:id` that, upon request, *retrieves* the specified user document **with the populated `favorites` field**:
-
-
-
-  <br>
-
-
-
-<details>
-  <summary><b>See Instructions</b></summary>
-
-  <br>
-
-
-
-**HTTP Request:**
-
-- Method: **`GET`**
-- Route: **`/users/:id`**
-
-
-
-**HTTP Response:**
-
-- Status code: **`200`** (OK)
-- Content-Type: JSON
-
-
-
-**Error Response:**
-
-- Status code: **`500`** (Internal Server Error) in case of an error.
-
-
-
-  <br>
-
-
-
-</details>
-
-
-
-<br>
-
-
-
-<hr>
-
-
-
-
 
 
 Happy coding! :heart:
