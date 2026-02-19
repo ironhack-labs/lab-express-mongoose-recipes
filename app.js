@@ -41,7 +41,8 @@ app.post("/recipes", (req, res) => {
         instructions: req.body.instructions,
         level: req.body.level,
         ingredients: req.body.ingredients,
-        image: req.body.duration,
+        image: req.body.image,
+        duration: req.body.duration,
         isArchived: req.body.isArchived,
         created: req.body.created,
     })
@@ -56,7 +57,7 @@ app.post("/recipes", (req, res) => {
 
 //  Iteration 4 - Get All Recipes
 //  GET  /recipes route
-app.get("/recipe/:id", (req, res) => {
+app.get("/recipes/:id", (req, res) => {
     Recipe.find()
     .then((allRecipes) => {
         res.status(200).json(allRecipes);
@@ -94,7 +95,7 @@ app.put("/recipes/:id", (req, res) => {
 //  Iteration 7 - Delete a Single Recipe
 //  DELETE  /recipes/:id route
 
-app.put("/recipe/:id", (req, res) => {
+app.delete("/recipe/:id", (req, res) => {
     Recipe.findByIdAndDelete(req.params.id)
     .then(() => {
         res.status(204).send();
