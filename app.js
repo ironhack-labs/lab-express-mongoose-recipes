@@ -1,6 +1,6 @@
 const express = require("express");
 const logger = require("morgan");
-
+const mongoose = require("mongoose");
 const app = express();
 
 // MIDDLEWARE
@@ -11,39 +11,86 @@ app.use(express.json());
 
 // Iteration 1 - Connect to MongoDB
 // DATABASE CONNECTION
+const MONGODB_URI = "mongodb://127.0.0.1:27017/express-mongoose-recipes-dev";
+mongoose
+  .connect(MONGODB_URI)
+  .then((x) => console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`))
+  .catch((err) => console.error("Error connecting to mongo", err));
+
 
 
 
 // ROUTES
-//  GET  / route
+//  GET  / route - This is just an example route
 app.get('/', (req, res) => {
-    res.send("<h1>Lab | Express Mongoose Recipes</h1>");
+    res.send("<h1>LAB | Express Mongoose Recipes</h1>");
 });
 
+const Recipe = require("./models/Recipe.model")
 
-//  Iteration 4 - Create recipe route
+//  Iteration 3 - Create a Recipe route
 //  POST  /recipes route
+app.post("/recipes", async(req, res)=>{
+    try {
+        await Recipe.create(req.body)
+        console.log(req.body)
+        res.send("add recipe")
+    } catch (error) {
+        console.log(error)
+    }
+})
 
-
-//  Iteration 5 - Read all recipes
+//  Iteration 4 - Get All Recipes
 //  GET  /recipes route
-
-
-//  Iteration 6 - Read a single recipe
+app.get("/recipes", async(req, res)=>{
+    try {
+        const response = await Recipe.find()
+        res.json(response)
+    } catch (error) {
+        console.log(error)
+    }
+})
+//  Iteration 5 - Get a Single Recipe
 //  GET  /recipes/:id route
+app.get("/recipes/:id", async(req, res)=>{
+    try {
+        const {id} =req.params
+        const response = await Recipe.findById(id)
+        res.json(response)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
-
-//  Iteration 7 - Update a single recipe
+//  Iteration 6 - Update a Single Recipe
 //  PUT  /recipes/:id route
+app.put('/recipes/:id', async(req, res)=>{
+    try {
+        const {id}= req.params
+        const response = await Recipe.findByIdAndUpdate(id ,req.body, {new: true})
+        res.json(response)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
-
-//  Iteration 8 - Delete a single recipe
+//  Iteration 7 - Delete a Single Recipe
 //  DELETE  /recipes/:id route
-
-
-//  Iteration 9 - Create a single user
-//  POST  /users route
+app.delete("/recipes/:id",async(req, res)=>{
+    try {
+        const {id}= req.params
+        await Recipe.findByIdAndDelete(id)
+        res.send("deleted successfully")
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 
 // Start the server
 app.listen(3000, () => console.log('My first app listening on port 3000!'));
+
+
+
+//❗️DO NOT REMOVE THE BELOW CODE
+module.exports = app;
