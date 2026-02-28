@@ -1,7 +1,10 @@
 const express = require("express");
 const logger = require("morgan");
+const mongoose = require("mongoose");
+const Recipe = require("./models/Recipe.model")
 
 const app = express();
+const MongoDB_URI = "mongodb://127.0.0.1:27017/express-mongoose-recipes-dev";
 
 // MIDDLEWARE
 app.use(logger("dev"));
@@ -11,7 +14,10 @@ app.use(express.json());
 
 // Iteration 1 - Connect to MongoDB
 // DATABASE CONNECTION
-
+mongoose
+    .connect(MongoDB_URI)
+    .then((x) => console.log(`Connected to MongoDB_URI! Database name: "${x.connections[0].name}"`))
+    .catch((err) => console.error("Error connecting to mongo", err));
 
 
 // ROUTES
@@ -22,23 +28,66 @@ app.get('/', (req, res) => {
 
 
 //  Iteration 3 - Create a Recipe route
-//  POST  /recipes route
+app.post("/recipes", (req, res) => {
+    Recipe.create(req.body) 
+    .then ((createdRecipe) => {
+        res.status(201).json(createdRecipe);
+    })
+    .catch ((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Error Creating recipe", error: err});
+    })
+})
 
 
 //  Iteration 4 - Get All Recipes
-//  GET  /recipes route
+app.get("/recipes", (req, res) => {
+    Recipe.find()
+    .then((allRecipes) => {
+        res.status(200).json(allRecipes);
+    })
+    .catch((error) => {
+        res.status(500).json({ message: "Error while getting all recipes" });
+    });
+});
 
 
 //  Iteration 5 - Get a Single Recipe
-//  GET  /recipes/:id route
+    app.get ("/recipes/:id", (req, res) => {
+        Recipe.findById(req.params.id)
+        .then((recipe) => {
+            res.status(200).json(recipe);
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Error while getting a single recipe" });
+        });
+    })
 
 
 //  Iteration 6 - Update a Single Recipe
-//  PUT  /recipes/:id route
+    app.put ("/recipes/:id", (req, res) => {
+        Recipe.findByIdAndUpdate(id, req.body, { new: true })
+        .then ((updateRecipe) => {
+            res.status(200).json(updatedRecipe);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).json ({ message: "Error while updating a single recipe" })
+        })
+    })
 
 
 //  Iteration 7 - Delete a Single Recipe
-//  DELETE  /recipes/:id route
+    app.delete ("/recipes/:id", (req, res) => {
+        Recipe.findByIdAndDelete(req.params.id)
+        .then(() => {
+            res.status(204).send();
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).json ({ message: "Error while updating a single Recipe"});
+        });
+    });
 
 
 
